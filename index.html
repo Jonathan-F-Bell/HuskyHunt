@@ -1,0 +1,167 @@
+
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" type="text/css" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
+
+
+  <title>Husky Hunt Web Tool</title>
+  <meta name="description" content="HuskyHunt web tool by Jonathan Bell">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/huskyhunt/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/huskyhunt/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/huskyhunt/favicon-16x16.png">
+  <link rel="manifest" href="/huskyhunt/site.webmanifest">
+  <link rel="mask-icon" href="/huskyhunt/safari-pinned-tab.svg" color="#cc0000">
+  <meta name="msapplication-TileColor" content="#b91d47">
+  <meta name="theme-color" content="#cc0000">
+
+</head>
+
+<body>
+  <div id="top-bar">
+    <div id="user-box">
+      <p class="name-text">Name</p>
+      <p class="email-text">email@example.com</p>
+    </div>
+    <div id="signout-box">
+      <button id="signout_button" style="">Sign Out</button>
+    </div>
+  </div>
+  <div id="content">
+    <div>
+      <h2>Clue Number</h2>
+      <input type="text" id="loc_number_field" name="locNum">
+    </div>
+
+    <div>
+      <input type="file" name="upload-photo" id="upload-photo">
+      <label for="upload-photo" class="button ripple label-button">Select Photo</label>
+    </div>
+
+    <div id="photo-preview">
+    </div>
+
+    <p id="error-text"></p>
+
+
+
+  </div>
+  <div id="submit-div">
+    <button id="submit_button" class="button ripple">Submit</button>
+  </div>
+
+  <!--Drive Auth -->
+
+
+    <!--Add buttons to initiate auth sequence and sign out-->
+    <div id="login-screen">
+      <button id="authorize_button" class="button ripple auth-button">Authorize</button>
+    </div>
+
+
+
+  <script type="text/javascript">
+      // Client ID and API key from the Developer Console
+      var CLIENT_ID = 'SET-THIS_YOUR_CLIENT_ID.apps.googleusercontent.com';
+      var API_KEY = 'SET-THIS_YOUR_API_KEY';
+
+      // Array of API discovery doc URLs for APIs used by the quickstart
+      var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+
+      // Authorization scopes required by the API; multiple scopes can be
+      // included, separated by spaces.
+      var SCOPES = 'https://www.googleapis.com/auth/drive';
+
+      var googleUser;
+      var userProfile;
+
+      var authorizeButton = document.getElementById('authorize_button');
+      var signoutButton = document.getElementById('signout_button');
+      var authorizeScreen = document.getElementById('login-screen');
+
+      /**
+       *  On load, called to load the auth2 library and API client library.
+       */
+      function handleClientLoad() {
+        gapi.load('client:auth2', initClient);
+      }
+
+      /**
+       *  Initializes the API client library and sets up sign-in state
+       *  listeners.
+       */
+      function initClient() {
+        gapi.client.init({
+          apiKey: API_KEY,
+          clientId: CLIENT_ID,
+          discoveryDocs: DISCOVERY_DOCS,
+          scope: SCOPES
+        }).then(function () {
+          // Listen for sign-in state changes.
+          gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+
+          // Handle the initial sign-in state.
+          updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+          authorizeButton.onclick = handleAuthClick;
+          signoutButton.onclick = handleSignoutClick;
+        });
+      }
+
+      /**
+       *  Called when the signed in status changes, to update the UI
+       *  appropriately. After a sign-in, the API is called.
+       */
+      function updateSigninStatus(isSignedIn) {
+        if (isSignedIn) {
+          authorizeScreen.style.display = 'none';
+          var authInst = gapi.auth2.getAuthInstance()
+          googleUser = authInst.currentUser.get();
+          userProfile = googleUser.getBasicProfile();
+          $(".name-text").text(userProfile.getName());
+          $(".email-text").text(userProfile.getEmail());
+
+        } else {
+          authorizeScreen.style.display = 'block';
+        }
+      }
+
+      /**
+       *  Sign in the user upon button click.
+       */
+      function handleAuthClick(event) {
+        gapi.auth2.getAuthInstance().signIn();
+      }
+
+      /**
+       *  Sign out the user upon button click.
+       */
+      function handleSignoutClick(event) {
+        gapi.auth2.getAuthInstance().signOut();
+      }
+
+
+    </script>
+
+  <!--Add buttons to initiate auth sequence and sign out-->
+    <button id="authorize_button" style="display: none;">Authorize</button>
+    <button id="signout_button" style="display: none;">Sign Out</button>
+
+    <pre id="content"></pre>
+
+    <script async defer src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
+
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="js/script.js"></script>
+
+</html>
